@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/all.css">
+  <title>Air Quality of Taiwan</title>
+</head>
+
+<body>
+  <div id="app">
+    <div class="header">
+      <div class="container">
+        <div class="input-group">
+          <h1>台灣空氣品質列表</h1>
+          <input type="search" v-model.trim="input" placeholder="搜尋要找的縣市，例：新北市">
+
+        </div>
+      </div>
+    </div>
+
+
+    <div class="container">
+      <ul class="list" v-for="(item, index) in typeMenu" :key="index">
+        <li class="county">{{item.County}}</li>
+        <li class="siteName">行政區：{{item.SiteName}}</li>
+        <li class="airStatus">空氣品質： {{item.Status}}
+        </li>
+        <li class="publishTime">{{item.PublishTime}}</li>
+      </ul>
+    </div>
+  </div>
+
+
+  <div class="footer">
+    <div class="container">
+      <p class="text">台灣空氣品質列表 by Hsuchihting</p>
+      <p>僅作練習使用</p>
+    </div>
+  </div>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.12/vue.js'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.0/axios.js'></script>
+  <script>
+    let aqi = "https://data.epa.gov.tw/api/v1/aqx_p_432?limit=1000&api_key=9be7b239-557b-4c10-9775-78cadfc555e9&format=json";
+    let vm = new Vue({
+      el: "#app",
+      data: {
+        contacts: [],
+        input: "",
+      },
+      created() {
+        axios.get(aqi).then((res) => {
+          this.contacts = res.data.records;
+        });
+      },
+      computed: {
+        typeMenu() {
+          let keyword = this.input.toLowerCase();
+          if (this.input) {
+            return this.contacts.filter((item) => {
+              let countyName = item.County.toLowerCase();
+              return countyName.indexOf(keyword) !== -1;
+            });
+          } else {
+            return this.contacts;
+          }
+        },
+      },
+    });
+  </script>
+
+</body>
+
+</html>
